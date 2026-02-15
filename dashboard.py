@@ -189,7 +189,7 @@ for symbol in SYMBOLS:
                 )
 
 
-     if price is not None:
+    if price is not None:
         price_histories[symbol].append(price)
 
     

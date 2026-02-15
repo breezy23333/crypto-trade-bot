@@ -5,23 +5,10 @@ import pandas_ta as ta
 import altair as alt
 from collections import deque
 from streamlit_autorefresh import st_autorefresh
-# from notifier_email import send_discord_alert
-
 import csv
 import json
 import sqlite3
-from datetime import datetime 
-from paper_trader import execute_paper_trade
-import streamlit as st
-import pandas as pd
-import altair as alt
-import time
-import random
-import streamlit as st
-import pandas as pd
-import altair as alt
-import requests
-import time
+from datetime import datetime
 
 
 # ------------------- Auto-refresh -------------------

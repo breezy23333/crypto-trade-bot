@@ -3,6 +3,8 @@ import requests
 import pandas as pd
 import pandas_ta as ta
 import altair as alt
+import random
+
 from collections import deque
 from streamlit_autorefresh import st_autorefresh
 import csv

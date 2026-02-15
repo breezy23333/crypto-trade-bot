@@ -178,10 +178,10 @@ for symbol in SYMBOLS:
     
     st.markdown(f"<div class='signal-box'>{symbol} price history length: {len(price_histories[symbol])}/14</div>", unsafe_allow_html=True)
     if price is not None:
-    st.markdown(
-        f"<div class='price-blink'>{symbol} – Current price: ${price:.2f}</div>",
-        unsafe_allow_html=True
-    )
+        st.markdown(
+            f"<div class='price-blink'>{symbol} – Current price: ${price:.2f}</div>",
+            unsafe_allow_html=True
+        )
         else:
             st.markdown(
                 f"<div class='price-blink'>{symbol} – Price unavailable</div>",

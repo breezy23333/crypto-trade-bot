@@ -4,6 +4,7 @@ import pandas as pd
 import pandas_ta as ta
 import altair as alt
 import random
+import time
 
 from collections import deque
 from streamlit_autorefresh import st_autorefresh

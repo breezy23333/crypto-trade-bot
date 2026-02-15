@@ -5,7 +5,8 @@ import pandas_ta as ta
 import altair as alt
 from collections import deque
 from streamlit_autorefresh import st_autorefresh
-from notifier_email import send_discord_alert
+# from notifier_email import send_discord_alert
+
 import csv
 import json
 import sqlite3

@@ -177,7 +177,17 @@ for symbol in SYMBOLS:
     st.write(f"{symbol} price history length: {len(price_histories[symbol])}/14")
     
     st.markdown(f"<div class='signal-box'>{symbol} price history length: {len(price_histories[symbol])}/14</div>", unsafe_allow_html=True)
-    st.markdown(f"<div class='price-blink'>{symbol} – Current price: ${price:.2f}</div>", unsafe_allow_html=True)
+    if price is not None:
+    st.markdown(
+        f"<div class='price-blink'>{symbol} – Current price: ${price:.2f}</div>",
+        unsafe_allow_html=True
+    )
+else:
+    st.markdown(
+        f"<div class='price-blink'>{symbol} – Price unavailable</div>",
+        unsafe_allow_html=True
+    )
+
     st.code(price_histories[symbol]) 
     
     st.write(f"{symbol} - Current price: {price}")

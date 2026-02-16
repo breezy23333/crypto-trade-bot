@@ -14,7 +14,6 @@
 import streamlit as st
 import requests
 import pandas as pd
-import pandas_ta as ta
 import altair as alt
 from collections import deque
 from streamlit_autorefresh import st_autorefresh
@@ -361,23 +360,37 @@ def get_price(symbol: str):
 # =========================
 # INDICATORS / SIGNALS
 # =========================
+def ema(series, span):
+    return series.ewm(span=span, adjust=False).mean()
+
+def rsi(series, period=14):
+    delta = series.diff()
+    gain = delta.clip(lower=0)
+    loss = -delta.clip(upper=0)
+    avg_gain = gain.rolling(period).mean()
+    avg_loss = loss.rolling(period).mean()
+    rs = avg_gain / avg_loss
+    return 100 - (100 / (1 + rs))
+
+def macd(series, fast=12, slow=26, signal=9):
+    ema_fast = ema(series, fast)
+    ema_slow = ema(series, slow)
+    macd_line = ema_fast - ema_slow
+    signal_line = ema(macd_line, signal)
+    hist = macd_line - signal_line
+    return macd_line, signal_line, hist
+
 def compute_indicators(close_series: pd.Series, ema_fast_len=10, ema_slow_len=30, rsi_len=14):
     df = pd.DataFrame({"close": close_series})
 
-    df["EMA_FAST"] = ta.ema(df["close"], length=ema_fast_len)
-    df["EMA_SLOW"] = ta.ema(df["close"], length=ema_slow_len)
-    df["RSI"] = ta.rsi(df["close"], length=rsi_len)
+    df["EMA_FAST"] = ema(df["close"], ema_fast_len)
+    df["EMA_SLOW"] = ema(df["close"], ema_slow_len)
+    df["RSI"] = rsi(df["close"], rsi_len)
 
-    macd = ta.macd(df["close"], fast=12, slow=26, signal=9)
-    # macd columns: MACD_12_26_9, MACDs_12_26_9, MACDh_12_26_9
-    if macd is not None and not macd.empty:
-        df["MACD"] = macd.iloc[:, 0]
-        df["MACD_SIGNAL"] = macd.iloc[:, 1]
-        df["MACD_HIST"] = macd.iloc[:, 2]
-    else:
-        df["MACD"] = None
-        df["MACD_SIGNAL"] = None
-        df["MACD_HIST"] = None
+    macd_line, signal_line, hist = macd(df["close"])
+    df["MACD"] = macd_line
+    df["MACD_SIGNAL"] = signal_line
+    df["MACD_HIST"] = hist
 
     return df
 

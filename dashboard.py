@@ -253,13 +253,14 @@ else:
 # ------------------- Charts -------------------
 st.subheader("📊 Live Charts")
 
-for symbol in SYMBOLS:
-    price = get_price(symbol)
-    price_histories[symbol].append(price)
+st.subheader("📊 Live Charts")
 
+for symbol in SYMBOLS:
     history = list(price_histories[symbol])
+
     if len(history) < 15:
         continue
+
 
     df = pd.DataFrame(history, columns=["close"])
     df["EMA10"] = ta.ema(df["close"], length=10)
@@ -382,36 +383,6 @@ price_placeholder = st.empty()
 chart_placeholder = st.empty()
 
 price_data = []
-
-for i in range(300):  # adjust how long it runs
-    mock_price = random.uniform(-1, 1)
-    moving_average += mock_price
-
-    # Add to history
-    price_data.append({"Time": i, "Price": moving_average})
-    df = pd.DataFrame(price_data)
-
-    # Show latest price
-    price_placeholder.markdown(f"### Current Price: **{moving_average:.2f}**")
-
-    # Determine signal
-    signal = None
-    if moving_average > threshold and last_signal != "BUY":
-        signal = "BUY"
-        last_signal = "BUY"
-    elif moving_average < threshold and last_signal != "SELL":
-        signal = "SELL"
-        last_signal = "SELL"
-
-    # Plot chart
-    chart = alt.Chart(df).mark_line().encode(
-        x="Time",
-        y="Price"
-    ).properties(height=300)
-
-    chart_placeholder.altair_chart(chart, use_container_width=True)
-
-    time.sleep(0.5)
     
 # Set symbol and threshold
 SYMBOL = "BTCUSDT"

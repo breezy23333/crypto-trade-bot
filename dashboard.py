@@ -16,19 +16,27 @@ import requests
 import pandas as pd
 import altair as alt
 from collections import deque
-from streamlit_autorefresh import st_autorefresh
 import csv
 import json
 import sqlite3
 from datetime import datetime
 import time
 import random
+import time
+
+if "last_refresh" not in st.session_state:
+    st.session_state.last_refresh = time.time()
+
+if time.time() - st.session_state.last_refresh > 10:
+    st.session_state.last_refresh = time.time()
+    st.rerun()
+
 
 # ------------------- MUST BE FIRST STREAMLIT CALL -------------------
 st.set_page_config(page_title="Crypto Trade Bot", layout="wide")
 
 # ------------------- Auto-refresh -------------------
-st_autorefresh(interval=10_000, limit=None, key="refresh")  # every 10 seconds
+  # every 10 seconds
 
 # =========================
 # SETTINGS / CONTROLS

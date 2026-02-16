@@ -144,6 +144,18 @@ def init_db():
     conn.commit()
     conn.close()
 
+def safe_float(x):
+    try:
+        if x is None:
+            return None
+        x = float(x)
+        if pd.isna(x) or x == float("inf") or x == float("-inf"):
+            return None
+        return x
+    except Exception:
+        return None
+
+
 def reset_signals_table():
     conn = sqlite3.connect(DB_FILE)
     cur = conn.cursor()
@@ -203,13 +215,13 @@ def save_signals_rows(rows: list[dict]):
                     (
                         r["Time"],
                         r["Symbol"],
-                        float(r["Price"]) if r["Price"] is not None else None,
-                        float(r["EMA_Fast"]) if r["EMA_Fast"] is not None else None,
-                        float(r["EMA_Slow"]) if r["EMA_Slow"] is not None else None,
-                        float(r["RSI"]) if r["RSI"] is not None else None,
-                        float(r["MACD"]) if r["MACD"] is not None else None,
-                        float(r["MACD_Signal"]) if r["MACD_Signal"] is not None else None,
-                        float(r["MACD_Hist"]) if r["MACD_Hist"] is not None else None,
+                        safe_float(r["Price"]),
+                        safe_float(r["EMA_Fast"]),
+                        safe_float(r["EMA_Slow"]),
+                        safe_float(r["RSI"]),
+                        safe_float(r["MACD"]),
+                        safe_float(r["MACD_Signal"]),
+                        safe_float(r["MACD_Hist"]),
                         r["Signal"],
                     ),
                 )

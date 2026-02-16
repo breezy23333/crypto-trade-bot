@@ -5,7 +5,7 @@ import pandas_ta as ta
 import altair as alt
 from collections import deque
 from streamlit_autorefresh import st_autorefresh
-from paper_trader import execute_paper_trade
+# from paper_trader import execute_paper_trade
 import csv
 import json
 import sqlite3

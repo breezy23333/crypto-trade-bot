@@ -188,11 +188,10 @@ def append_trade_db(trade_row: dict):
 
 def save_signals_rows(rows: list[dict]):
     """
-    Save to CSV + JSONL + SQLite.
-    Safe, no duplicates, no NaN/Inf, no crashes.
+    Save to CSV + JSONL + SQLite (SAFE, no duplicates, no crashes)
     """
 
-    # ---------- CSV ----------
+    # ---- CSV
     with open(CSV_FILE, mode="a", newline="") as f:
         fieldnames = [
             "Time", "Symbol", "Price",
@@ -203,20 +202,18 @@ def save_signals_rows(rows: list[dict]):
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         if f.tell() == 0:
             writer.writeheader()
-
         for r in rows:
             writer.writerow(r)
 
-    # ---------- JSONL ----------
+    # ---- JSONL
     with open(JSONL_FILE, mode="a") as f:
         for r in rows:
             json.dump(r, f)
             f.write("\n")
 
-    # ---------- SQLite ----------
+    # ---- SQLite
     conn = sqlite3.connect(DB_FILE)
     cur = conn.cursor()
-
     for r in rows:
         cur.execute(
             """
@@ -241,9 +238,9 @@ def save_signals_rows(rows: list[dict]):
                 r["Signal"],
             ),
         )
-
     conn.commit()
     conn.close()
+
 
 
 def load_portfolio_from_disk():

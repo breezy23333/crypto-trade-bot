@@ -794,7 +794,7 @@ else:
     ).properties(height=330, title=f"{SYMBOL} Live Price (last {len(live_df)} points)")
 
     if len(live_df) >= 2:
-    st.altair_chart(live_chart, use_container_width=True)
+        st.altair_chart(live_chart, use_container_width=True)
     else:
         st.info("Waiting for valid live price data…")
 

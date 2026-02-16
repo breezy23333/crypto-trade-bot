@@ -66,27 +66,47 @@ price_histories = st.session_state.price_histories
 # =========================
 # Networking (FIXED: one source, retry, user-agent, clean errors)
 # =========================
-def get_price(symbol: str):
+def get_price(symbol):
     """
-    Reliable Binance price fetch.
-    Returns float or None.
+    Try Binance first (fast).
+    Fallback to CoinGecko if Binance is blocked (Streamlit Cloud).
     """
-    url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
-    headers = {"User-Agent": "Mozilla/5.0"}
 
+    # ---------- Binance ----------
     try:
-        r = requests.get(url, headers=headers, timeout=8)
-        # If rate-limited or blocked, this will raise for 4xx/5xx
-        r.raise_for_status()
-        data = r.json()
+        url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
+        r = requests.get(url, timeout=6)
+        if r.status_code == 200:
+            data = r.json()
+            if "price" in data:
+                return float(data["price"])
+    except:
+        pass
 
-        # Binance sometimes returns {"code":..., "msg":...} if blocked/invalid
-        if "price" not in data:
+    # ---------- CoinGecko fallback ----------
+    try:
+        mapping = {
+            "BTCUSDT": "bitcoin",
+            "ETHUSDT": "ethereum",
+            "BNBUSDT": "binancecoin",
+        }
+        coin = mapping.get(symbol)
+        if not coin:
             return None
 
-        return float(data["price"])
+        url = (
+            "https://api.coingecko.com/api/v3/simple/price"
+            f"?ids={coin}&vs_currencies=usd"
+        )
+        r = requests.get(url, timeout=6)
+        if r.status_code == 200:
+            data = r.json()
+            return float(data[coin]["usd"])
     except:
-        return None
+        pass
+
+    return None
+
 
 
 def calculate_sma(prices):

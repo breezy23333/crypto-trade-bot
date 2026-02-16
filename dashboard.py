@@ -189,30 +189,30 @@ def save_signals_rows(rows: list[dict]):
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         if f.tell() == 0:
             writer.writeheader()
-        for r in rows:
-            cur.execute(
-                """
-                INSERT INTO signals (
-                    time, symbol, price,
-                    ema_fast, ema_slow, rsi,
-                    macd, macd_signal, macd_hist,
-                    signal
+            for r in rows:
+                cur.execute(
+                    """
+                    INSERT INTO signals (
+                        time, symbol, price,
+                        ema_fast, ema_slow, rsi,
+                        macd, macd_signal, macd_hist,
+                        signal
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        r["Time"],
+                        r["Symbol"],
+                        float(r["Price"]) if r["Price"] is not None else None,
+                        float(r["EMA_Fast"]) if r["EMA_Fast"] is not None else None,
+                        float(r["EMA_Slow"]) if r["EMA_Slow"] is not None else None,
+                        float(r["RSI"]) if r["RSI"] is not None else None,
+                        float(r["MACD"]) if r["MACD"] is not None else None,
+                        float(r["MACD_Signal"]) if r["MACD_Signal"] is not None else None,
+                        float(r["MACD_Hist"]) if r["MACD_Hist"] is not None else None,
+                        r["Signal"],
+                    ),
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    r["Time"],
-                    r["Symbol"],
-                    float(r["Price"]) if r["Price"] is not None else None,
-                    float(r["EMA_Fast"]) if r["EMA_Fast"] is not None else None,
-                    float(r["EMA_Slow"]) if r["EMA_Slow"] is not None else None,
-                    float(r["RSI"]) if r["RSI"] is not None else None,
-                    float(r["MACD"]) if r["MACD"] is not None else None,
-                    float(r["MACD_Signal"]) if r["MACD_Signal"] is not None else None,
-                    float(r["MACD_Hist"]) if r["MACD_Hist"] is not None else None,
-                    r["Signal"],
-                ),
-            )
 
 
     # ---- JSONL

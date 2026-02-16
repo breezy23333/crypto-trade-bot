@@ -188,9 +188,11 @@ def append_trade_db(trade_row: dict):
 
 def save_signals_rows(rows: list[dict]):
     """
-    Save to CSV + JSONL + SQLite. Safe and consistent.
+    Save to CSV + JSONL + SQLite.
+    Safe, no duplicates, no NaN/Inf, no crashes.
     """
-    # ---- CSV
+
+    # ---------- CSV ----------
     with open(CSV_FILE, mode="a", newline="") as f:
         fieldnames = [
             "Time", "Symbol", "Price",
@@ -201,60 +203,45 @@ def save_signals_rows(rows: list[dict]):
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         if f.tell() == 0:
             writer.writeheader()
-            for r in rows:
-                cur.execute(
-                    """
-                    INSERT INTO signals (
-                        time, symbol, price,
-                        ema_fast, ema_slow, rsi,
-                        macd, macd_signal, macd_hist,
-                        signal
-                    )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """,
-                    (
-                        r["Time"],
-                        r["Symbol"],
-                        safe_float(r["Price"]),
-                        safe_float(r["EMA_Fast"]),
-                        safe_float(r["EMA_Slow"]),
-                        safe_float(r["RSI"]),
-                        safe_float(r["MACD"]),
-                        safe_float(r["MACD_Signal"]),
-                        safe_float(r["MACD_Hist"]),
-                        r["Signal"],
-                    ),
-                )
 
+        for r in rows:
+            writer.writerow(r)
 
-    # ---- JSONL
+    # ---------- JSONL ----------
     with open(JSONL_FILE, mode="a") as f:
         for r in rows:
             json.dump(r, f)
             f.write("\n")
 
-    # ---- SQLite
+    # ---------- SQLite ----------
     conn = sqlite3.connect(DB_FILE)
     cur = conn.cursor()
+
     for r in rows:
         cur.execute(
             """
-            INSERT INTO signals (time, symbol, price, ema_fast, ema_slow, rsi, macd, macd_signal, macd_hist, signal)
+            INSERT INTO signals (
+                time, symbol, price,
+                ema_fast, ema_slow, rsi,
+                macd, macd_signal, macd_hist,
+                signal
+            )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 r["Time"],
                 r["Symbol"],
-                r["Price"],
-                r["EMA_Fast"],
-                r["EMA_Slow"],
-                r["RSI"],
-                r["MACD"],
-                r["MACD_Signal"],
-                r["MACD_Hist"],
+                safe_float(r["Price"]),
+                safe_float(r["EMA_Fast"]),
+                safe_float(r["EMA_Slow"]),
+                safe_float(r["RSI"]),
+                safe_float(r["MACD"]),
+                safe_float(r["MACD_Signal"]),
+                safe_float(r["MACD_Hist"]),
                 r["Signal"],
             ),
         )
+
     conn.commit()
     conn.close()
 

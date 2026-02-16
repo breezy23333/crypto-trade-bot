@@ -194,23 +194,27 @@ data = []
 
 # ------------------- Logic -------------------
 data = []
-
 for symbol in SYMBOLS:
     price = get_price(symbol)
     price_histories[symbol].append(price)
+
     st.write(f"{symbol} price history length: {len(price_histories[symbol])}/14")
-    
-    st.markdown(f"<div class='signal-box'>{symbol} price history length: {len(price_histories[symbol])}/14</div>", unsafe_allow_html=True)
-    if price is not None:
     st.markdown(
-        f"<div class='price-blink'>{symbol} – Current price: ${price:.2f}</div>",
+        f"<div class='signal-box'>{symbol} price history length: {len(price_histories[symbol])}/14</div>",
         unsafe_allow_html=True
     )
+
+    if price is not None:
+        st.markdown(
+            f"<div class='price-blink'>{symbol} – Current price: ${price:.2f}</div>",
+            unsafe_allow_html=True
+        )
     else:
         st.markdown(
             f"<div class='price-blink'>{symbol} – Price unavailable</div>",
             unsafe_allow_html=True
-            )
+        )
+
 
     st.code(price_histories[symbol]) 
     

@@ -772,6 +772,13 @@ else:
 
     live_df = pd.DataFrame(st.session_state.live_price_data)
 
+    # ✅ FIX: drop bad rows BEFORE charting
+    live_df = live_df.dropna()
+    live_df = live_df[
+        live_df["Price"].apply(lambda x: isinstance(x, (int, float)))
+    ]
+
+
     live_signal = "HOLD"
     if live_price > THRESHOLD:
         live_signal = "BUY"
@@ -786,7 +793,11 @@ else:
         tooltip=["Time", "Price"]
     ).properties(height=330, title=f"{SYMBOL} Live Price (last {len(live_df)} points)")
 
+    if len(live_df) >= 2:
     st.altair_chart(live_chart, use_container_width=True)
+    else:
+        st.info("Waiting for valid live price data…")
+
 
 # =========================
 # SIGNAL SUMMARY CARDS

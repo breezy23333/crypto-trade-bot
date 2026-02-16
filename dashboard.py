@@ -10,7 +10,6 @@ import csv
 import json
 import sqlite3
 from datetime import datetime 
-from paper_trader import execute_paper_trade
 import streamlit as st
 import pandas as pd
 import altair as alt

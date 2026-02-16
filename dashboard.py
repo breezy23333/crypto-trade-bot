@@ -206,10 +206,10 @@ for symbol in SYMBOLS:
         f"<div class='price-blink'>{symbol} – Current price: ${price:.2f}</div>",
         unsafe_allow_html=True
     )
-        else:
-            st.markdown(
-                f"<div class='price-blink'>{symbol} – Price unavailable</div>",
-                unsafe_allow_html=True
+    else:
+        st.markdown(
+            f"<div class='price-blink'>{symbol} – Price unavailable</div>",
+            unsafe_allow_html=True
             )
 
     st.code(price_histories[symbol]) 

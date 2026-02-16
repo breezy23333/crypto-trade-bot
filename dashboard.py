@@ -34,19 +34,16 @@ price_histories = {symbol: deque(maxlen=MOVING_AVERAGE_PERIOD) for symbol in SYM
 
 # ------------------- Functions -------------------
 def get_price(symbol):
-    mapping = {
-        "BTCUSDT": "bitcoin",
-        "ETHUSDT": "ethereum",
-        "BNBUSDT": "binancecoin"
-    }
-    coin = mapping[symbol]
-    url = f"https://api.coingecko.com/api/v3/simple/price?ids={coin}&vs_currencies=usd"
     try:
-        r = requests.get(url, timeout=10)
-        data = r.json()
-        return data[coin]["usd"]
+        url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
+        r = requests.get(url, timeout=5)
+        return float(r.json()["price"])
     except:
         return None
+st.sidebar.markdown("### 🔍 Debug Prices")
+for s in SYMBOLS:
+    st.sidebar.write(s, get_price(s))
+
 
 prices = {}
 for symbol in SYMBOLS:
@@ -267,9 +264,7 @@ st.subheader("📊 Live Charts")
 
 for symbol in SYMBOLS:
     price = get_price(symbol)
-    price_histories[symbol].append(price)
-
-    history = list(price_histories[symbol])
+    history = [p for p in price_histories[symbol] if p is not None]
     if len(history) < 15:
         continue
 

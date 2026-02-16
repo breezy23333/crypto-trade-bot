@@ -5,6 +5,7 @@ import pandas_ta as ta
 import altair as alt
 from collections import deque
 from streamlit_autorefresh import st_autorefresh
+from paper_trader import execute_paper_trade
 import csv
 import json
 import sqlite3
@@ -21,6 +22,8 @@ import altair as alt
 import requests
 import time
 
+def execute_paper_trade(*args, **kwargs):
+    return None
 
 # ------------------- Auto-refresh -------------------
 st_autorefresh(interval=10000, limit=None, key="refresh")

@@ -127,7 +127,7 @@ def init_db():
             macd_hist REAL,
             signal TEXT
         )
-        """
+        """ 
     )
     cur.execute(
         """
@@ -141,6 +141,14 @@ def init_db():
         )
         """
     )
+    conn.commit()
+    conn.close()
+
+def reset_signals_table():
+    conn = sqlite3.connect(DB_FILE)
+    cur = conn.cursor()
+    cur.execute("DROP TABLE IF EXISTS signals")
+    cur.execute("DROP TABLE IF EXISTS trades")
     conn.commit()
     conn.close()
 
@@ -182,7 +190,30 @@ def save_signals_rows(rows: list[dict]):
         if f.tell() == 0:
             writer.writeheader()
         for r in rows:
-            writer.writerow(r)
+    cur.execute(
+        """
+        INSERT INTO signals (
+            time, symbol, price,
+            ema_fast, ema_slow, rsi,
+            macd, macd_signal, macd_hist,
+            signal
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            r["Time"],
+            r["Symbol"],
+            float(r["Price"]) if r["Price"] is not None else None,
+            float(r["EMA_Fast"]) if r["EMA_Fast"] is not None else None,
+            float(r["EMA_Slow"]) if r["EMA_Slow"] is not None else None,
+            float(r["RSI"]) if r["RSI"] is not None else None,
+            float(r["MACD"]) if r["MACD"] is not None else None,
+            float(r["MACD_Signal"]) if r["MACD_Signal"] is not None else None,
+            float(r["MACD_Hist"]) if r["MACD_Hist"] is not None else None,
+            r["Signal"],
+        ),
+    )
+
 
     # ---- JSONL
     with open(JSONL_FILE, mode="a") as f:
@@ -519,8 +550,10 @@ price_histories = st.session_state.price_histories
 
 # Init DB once
 if not st.session_state.db_initialized:
-    init_db()
+    reset_signals_table()   # ✅ wipes old broken schema
+    init_db()               # ✅ recreates correct schema
     st.session_state.db_initialized = True
+
 
 # Load portfolio once (if not loaded yet)
 if "portfolio_loaded" not in st.session_state:

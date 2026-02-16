@@ -495,5 +495,3 @@ if not df_display.empty and "Signal" in df_display.columns:
         """, unsafe_allow_html=True)
 else:
     st.warning("No signal data available yet.")    
-
-

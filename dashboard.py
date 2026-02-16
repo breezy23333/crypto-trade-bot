@@ -36,13 +36,15 @@ price_histories = {symbol: deque(maxlen=MOVING_AVERAGE_PERIOD) for symbol in SYM
 def get_price(symbol):
     try:
         url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
-        r = requests.get(url, timeout=5)
+        headers = {
+            "User-Agent": "Mozilla/5.0"
+        }
+        r = requests.get(url, headers=headers, timeout=5)
+        r.raise_for_status()
         return float(r.json()["price"])
-    except:
+    except Exception as e:
         return None
-st.sidebar.markdown("### 🔍 Debug Prices")
-for s in SYMBOLS:
-    st.sidebar.write(s, get_price(s))
+
 
 
 prices = {}

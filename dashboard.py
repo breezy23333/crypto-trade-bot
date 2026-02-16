@@ -15,7 +15,6 @@ from datetime import datetime
 
 
 # ------------------- Auto-refresh -------------------
-st_autorefresh(interval=10000, limit=None, key="refresh")
 
 # ------------------- Settings -------------------
 SYMBOLS = ["BTCUSDT", "ETHUSDT", "BNBUSDT"]
@@ -24,13 +23,24 @@ price_histories = {symbol: deque(maxlen=MOVING_AVERAGE_PERIOD) for symbol in SYM
 
 # ------------------- Functions -------------------
 def get_price(symbol):
-    url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
+    mapping = {
+        "BTCUSDT": "bitcoin",
+        "ETHUSDT": "ethereum",
+        "BNBUSDT": "binancecoin"
+    }
+    coin = mapping[symbol]
+    url = f"https://api.coingecko.com/api/v3/simple/price?ids={coin}&vs_currencies=usd"
     try:
-        response = requests.get(url)
-        data = response.json()
-        return float(data['price'])
+        r = requests.get(url, timeout=10)
+        data = r.json()
+        return data[coin]["usd"]
     except:
         return None
+
+prices = {}
+for symbol in SYMBOLS:
+    prices[symbol] = get_price(symbol)
+
 
 def calculate_sma(prices):
     return sum(prices) / len(prices) if prices else None
